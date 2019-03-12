@@ -368,3 +368,43 @@ def clustered_vert(script, cell_size=1.0, strategy='AVERAGE', selected=False):
     if isinstance(script, FilterScript):
         script.add_layer('Cluster Samples')
     return None
+
+def distance_to_reference_mesh(script, measured_layer=1, reference_layer=0,
+                       signed_distance=True):
+    """ Compute the distance to the reference mesh and store it in vertex quality
+
+    Args:
+        script: the FilterScript object or script filename to write
+            the filter to.
+        measured_layer (int): The mesh layer whose quality is measured.
+        reference_layer (int): The mesh that is used as a reference.
+        signed_distance (bool): Whether to used signed distances.
+
+    MeshLab versions:
+        2016.12
+        1.3.4BETA
+    """
+    filter_xml = ''.join([
+        '<filter name="Distance from Reference Mesh">\n',
+        '<Param name="MeasureMesh" ',
+        'value="{:d}" '.format(measured_layer),
+        'description="Measured Mesh" ',
+        'type="RichMesh" ',
+        '/>\n',
+        '    <Param name="RefMesh" ',
+        'value="{:d}" '.format(reference_layer),
+        'description="Reference Mesh" ',
+        'type="RichMesh" ',
+        '/>\n',
+        '    <Param name="SignedDist" ',
+        'value="{}" '.format(str(signed_distance).lower()),
+        'description="Use signed distances" ',
+        'type="RichBool" ',
+        '/>\n',
+        '  </filter>\n'
+        '<xmlfilter name="Per Vertex Quality Stat">',
+        '</xmlfilter>'])
+    util.write_filter(script, filter_xml)
+    if isinstance(script, FilterScript):
+        script.parse_vertex_quality_stats = True
+    return None

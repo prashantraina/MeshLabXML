@@ -99,6 +99,8 @@ class FilterScript(object):
         self.parse_geometry = False
         self.parse_topology = False
         self.parse_hausdorff = False
+        self.vertex_quality_stats = None
+        self.parse_vertex_quality_stats = False
         # Process input files
         # Process project files first
 
@@ -235,7 +237,7 @@ class FilterScript(object):
             self.save_to_file(temp_script_file.name)
             script_file = temp_script_file.name
 
-        if (self.parse_geometry or self.parse_topology or self.parse_hausdorff) and (ml_log is None):
+        if (self.parse_geometry or self.parse_topology or self.parse_hausdorff or self.parse_vertex_quality_stats) and (ml_log is None):
             # create temp ml_log
             temp_ml_log = True
             ml_log_file = tempfile.NamedTemporaryFile(delete=False, suffix='.txt')
@@ -257,6 +259,8 @@ class FilterScript(object):
             self.topology = compute.parse_topology(ml_log, log, print_output=print_meshlabserver_output)
         if self.parse_hausdorff:
             self.hausdorff_distance = compute.parse_hausdorff(ml_log, log, print_output=print_meshlabserver_output)
+        if self.parse_vertex_quality_stats:
+            self.vertex_quality_stats = compute.parse_vertex_quality_stats(ml_log, log, print_output=print_meshlabserver_output)
 
         # Delete temp files
         if self.__no_file_in:
